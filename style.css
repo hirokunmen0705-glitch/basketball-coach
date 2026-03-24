@@ -1,0 +1,121 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, sans-serif;
+  background: #111;
+  color: #fff;
+  min-height: 100dvh;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  margin-bottom: 24px;
+}
+
+.screen { max-width: 480px; margin: 0 auto; }
+.hidden { display: none !important; }
+
+.card {
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label { font-size: 0.85rem; color: #aaa; }
+
+input[type="password"],
+input[type="text"] {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+input[type="range"] { width: 100%; accent-color: #f90; }
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: #f90;
+  color: #000;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  padding: 8px 16px;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+/* メイン画面 */
+#status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+#phase-label {
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #222;
+  min-width: 120px;
+  text-align: center;
+}
+
+#phase-label.offense { background: #1a4a1a; color: #4f4; }
+#phase-label.defense { background: #4a1a1a; color: #f44; }
+
+.btn-stop {
+  padding: 10px 20px;
+  background: #555;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#camera {
+  width: 100%;
+  border-radius: 12px;
+  background: #000;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+
+#log {
+  margin-top: 12px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 12px;
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.log-hint { color: #555; }
+.log-ok { color: #4f4; }
+.log-change { color: #f90; font-weight: bold; }
+.log-err { color: #f44; }

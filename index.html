@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="バスケコーチくん">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <title>バスケコーチくん</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 設定画面 -->
+  <div id="setup-screen" class="screen">
+    <h1>🏀 バスケコーチくん</h1>
+    <div class="card">
+      <label>Gemini API キー</label>
+      <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off">
+      <button id="save-key-btn" class="btn-secondary">保存</button>
+    </div>
+    <div class="card">
+      <label>解析間隔（秒）</label>
+      <input type="range" id="interval-input" min="1" max="5" value="2" step="0.5">
+      <span id="interval-display">2秒</span>
+    </div>
+    <div class="card">
+      <label>カスタム指示（攻撃時）</label>
+      <input type="text" id="offense-text" value="攻撃です。シュートを狙って。">
+    </div>
+    <div class="card">
+      <label>カスタム指示（守備時）</label>
+      <input type="text" id="defense-text" value="守備に切り替え。マークにつけ。">
+    </div>
+    <button id="start-btn" class="btn-primary">▶ 開始</button>
+  </div>
+
+  <!-- メイン画面 -->
+  <div id="main-screen" class="screen hidden">
+    <div id="status-bar">
+      <span id="phase-label">--</span>
+      <button id="stop-btn" class="btn-stop">■ 停止</button>
+    </div>
+    <video id="camera" autoplay playsinline muted></video>
+    <canvas id="capture-canvas" class="hidden"></canvas>
+    <div id="log">
+      <p class="log-hint">解析ログ</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
