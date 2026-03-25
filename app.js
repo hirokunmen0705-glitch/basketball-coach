@@ -2,7 +2,7 @@
 
 // ── 定数 ──────────────────────────────────────────────
 const GEMINI_ENDPOINT =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
 const CAPTURE_W = 480;
 const CAPTURE_H = 270;
 
@@ -58,8 +58,9 @@ window.addEventListener('DOMContentLoaded', () => {
   if (savedDef)   defenseText.value = savedDef;
 
   if (savedRef) {
-    refPhotoB64 = savedRef;
-    showRefPreview(`data:image/jpeg;base64,${savedRef}`);
+    // data URL prefix が混入していた場合は除去
+    refPhotoB64 = savedRef.includes(',') ? savedRef.split(',')[1] : savedRef;
+    showRefPreview(`data:image/jpeg;base64,${refPhotoB64}`);
   }
 });
 
