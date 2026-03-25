@@ -15,37 +15,58 @@
   <!-- 設定画面 -->
   <div id="setup-screen" class="screen">
     <h1>🏀 バスケコーチくん</h1>
+
     <div class="card">
-      <label>Gemini API キー（複数の場合はカンマ区切り）</label>
-      <input type="password" id="api-key-input" placeholder="AIza...,AIza...,AIza..." autocomplete="off">
+      <label>Gemini API キー（複数ならカンマ区切り）</label>
+      <input type="password" id="api-key-input" placeholder="AIza...,AIza..." autocomplete="off">
       <button id="save-key-btn" class="btn-secondary">保存</button>
     </div>
+
+    <div class="card">
+      <label>🎯 追う選手の写真</label>
+      <div id="ref-preview-wrap" class="hidden">
+        <img id="ref-preview" alt="登録済み参考写真">
+        <button id="ref-clear-btn" class="btn-secondary">✕ 削除</button>
+      </div>
+      <label id="ref-upload-label" class="btn-upload">
+        📷 写真を登録する
+        <input type="file" id="ref-photo-input" accept="image/*">
+      </label>
+      <small style="color:#888">試合前に選手の顔・背番号が見える写真を撮っておくと精度アップ</small>
+    </div>
+
+    <div class="card">
+      <label>🔢 背番号 / ユニフォーム色（写真なし時に使用）</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="player-number" placeholder="例: 6" style="width:50%">
+        <input type="text" id="player-color" placeholder="例: 白" style="width:50%">
+      </div>
+    </div>
+
     <div class="card">
       <label>解析間隔（秒）</label>
       <input type="range" id="interval-input" min="2" max="15" value="7" step="1">
       <span id="interval-display">7秒</span>
-      <small style="color:#888">無料枠: 7秒以上推奨（10req/分制限）</small>
+      <small style="color:#888">無料枠は7秒以上推奨（10req/分）</small>
     </div>
+
     <div class="card">
-      <label>🎬 テスト用動画ファイル（省略するとカメラ使用）</label>
-      <input type="file" id="video-file-input" accept="video/*" style="color:#ccc;font-size:0.9rem">
-    </div>
-    <div class="card">
-      <label>🎯 注目選手（省略可）</label>
-      <div style="display:flex;gap:8px;margin-bottom:6px">
-        <input type="text" id="player-number" placeholder="背番号（例: 6）" style="width:50%">
-        <input type="text" id="player-color" placeholder="ユニフォーム色（例: 白）" style="width:50%">
-      </div>
-      <small style="color:#888">入力すると、その選手に絞って攻守を判定します</small>
-    </div>
-    <div class="card">
-      <label>カスタム指示（攻撃時）</label>
+      <label>音声指示（攻撃時）</label>
       <input type="text" id="offense-text" value="攻撃です。シュートを狙って。">
     </div>
     <div class="card">
-      <label>カスタム指示（守備時）</label>
+      <label>音声指示（守備時）</label>
       <input type="text" id="defense-text" value="守備に切り替え。マークにつけ。">
     </div>
+
+    <details style="margin-bottom:12px">
+      <summary style="color:#666;font-size:0.85rem;cursor:pointer;padding:4px 0">デバッグ用: 動画ファイルで動作確認</summary>
+      <div class="card" style="margin-top:8px">
+        <label>動画ファイル（選択するとカメラの代わりに使用）</label>
+        <input type="file" id="video-file-input" accept="video/*" style="color:#ccc;font-size:0.9rem">
+      </div>
+    </details>
+
     <button id="start-btn" class="btn-primary">▶ 開始</button>
   </div>
 

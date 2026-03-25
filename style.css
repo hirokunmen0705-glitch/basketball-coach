@@ -119,3 +119,32 @@ input[type="range"] { width: 100%; accent-color: #f90; }
 .log-ok { color: #4f4; }
 .log-change { color: #f90; font-weight: bold; }
 .log-err { color: #f44; }
+
+/* 参考写真 */
+.btn-upload {
+  display: inline-block;
+  padding: 10px 16px;
+  background: #2a2a2a;
+  border: 2px dashed #555;
+  border-radius: 8px;
+  color: #aaa;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+}
+.btn-upload input[type="file"] { display: none; }
+
+#ref-preview-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+#ref-preview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #f90;
+}
