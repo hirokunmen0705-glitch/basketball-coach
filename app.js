@@ -13,6 +13,8 @@ const intervalInput = document.getElementById('interval-input');
 const intervalDisp  = document.getElementById('interval-display');
 const offenseText   = document.getElementById('offense-text');
 const defenseText   = document.getElementById('defense-text');
+const playerNumber  = document.getElementById('player-number');
+const playerColor   = document.getElementById('player-color');
 const startBtn      = document.getElementById('start-btn');
 const stopBtn       = document.getElementById('stop-btn');
 const video         = document.getElementById('camera');
@@ -114,8 +116,10 @@ async function analyze() {
     if (phase && phase !== prevPhase) {
       prevPhase = phase;
       updatePhaseUI(phase);
-      speak(phase === 'offense' ? offenseText.value : defenseText.value);
-      addLog(`🔄 → ${phase === 'offense' ? '攻撃' : '守備'}`, 'log-change');
+      const num    = playerNumber?.value.trim();
+      const prefix = num ? `${num}番、` : '';
+      speak(prefix + (phase === 'offense' ? offenseText.value : defenseText.value));
+      addLog(`🔄 → ${phase === 'offense' ? '攻撃' : '守備'}${num ? ` (${num}番)` : ''}`, 'log-change');
     } else if (phase) {
       addLog(`  ${phase === 'offense' ? '攻撃継続' : '守備継続'}`, '');
     }
@@ -135,11 +139,24 @@ function captureFrame() {
   return canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
 }
 
-// ── Gemini API 呼び出し ────────────────────────────────
-async function callGemini(base64) {
-  const prompt = `この画像はバスケットボールの試合をコートサイドから撮影したものです。
+// ── Gemini プロンプト生成 ──────────────────────────────
+function buildPrompt() {
+  const num   = playerNumber?.value.trim();
+  const color = playerColor?.value.trim();
+  if (num || color) {
+    const target = [color, num ? `${num}番` : ''].filter(Boolean).join('の');
+    return `この画像はバスケットボールの試合をコートサイドから撮影したものです。
+${target}の選手を特定して、その選手は今「攻撃」側ですか「守備」側ですか？
+「offense」または「defense」の1単語だけで答えてください。その選手が画面に映っていないか判断できない場合は「unknown」。`;
+  }
+  return `この画像はバスケットボールの試合をコートサイドから撮影したものです。
 画像を見て、映っているチームは今「攻撃」と「守備」どちらの状態に近いですか？
 「offense」または「defense」の1単語だけで答えてください。判断できない場合は「unknown」。`;
+}
+
+// ── Gemini API 呼び出し ────────────────────────────────
+async function callGemini(base64) {
+  const prompt = buildPrompt();
 
   // APIキーはヘッダーで渡す（URLに露出させない）
   const res = await fetch(GEMINI_ENDPOINT, {
