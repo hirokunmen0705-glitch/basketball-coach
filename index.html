@@ -22,8 +22,13 @@
     </div>
     <div class="card">
       <label>解析間隔（秒）</label>
-      <input type="range" id="interval-input" min="1" max="5" value="2" step="0.5">
-      <span id="interval-display">2秒</span>
+      <input type="range" id="interval-input" min="2" max="15" value="7" step="1">
+      <span id="interval-display">7秒</span>
+      <small style="color:#888">無料枠: 7秒以上推奨（10req/分制限）</small>
+    </div>
+    <div class="card">
+      <label>🎬 テスト用動画ファイル（省略するとカメラ使用）</label>
+      <input type="file" id="video-file-input" accept="video/*" style="color:#ccc;font-size:0.9rem">
     </div>
     <div class="card">
       <label>🎯 注目選手（省略可）</label>
