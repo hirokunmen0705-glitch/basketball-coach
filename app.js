@@ -26,13 +26,14 @@ const phaseLabel     = document.getElementById('phase-label');
 const log            = document.getElementById('log');
 
 // ── 状態 ──────────────────────────────────────────────
-let apiKey        = '';
+let apiKeys       = [];   // ローテーション用キー配列
+let keyIndex      = 0;
 let intervalSec   = 7;
 let prevPhase     = null;
 let timerId       = null;
 let isAnalyzing   = false;
-let rateLimitUntil = 0;   // ms タイムスタンプ（この時刻まで待機）
-let rateLimitRetry = 6000; // 最初のバックオフ 6秒
+let rateLimitUntil = 0;
+let rateLimitRetry = 6000;
 
 // ── 起動時に保存済みキーを復元 ─────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -45,7 +46,8 @@ saveKeyBtn.addEventListener('click', () => {
   const key = apiKeyInput.value.trim();
   if (!key) { alert('APIキーを入力してください'); return; }
   localStorage.setItem('gemini_api_key', key);
-  saveKeyBtn.textContent = '✓ 保存済み';
+  const count = key.split(',').filter(k => k.trim()).length;
+  saveKeyBtn.textContent = `✓ ${count}件保存`;
   setTimeout(() => { saveKeyBtn.textContent = '保存'; }, 1500);
 });
 
@@ -57,8 +59,10 @@ intervalInput.addEventListener('input', () => {
 
 // ── 開始 ──────────────────────────────────────────────
 startBtn.addEventListener('click', async () => {
-  apiKey = localStorage.getItem('gemini_api_key') || apiKeyInput.value.trim();
-  if (!apiKey) { alert('Gemini APIキーを保存してください'); return; }
+  const raw = localStorage.getItem('gemini_api_key') || apiKeyInput.value.trim();
+  if (!raw) { alert('Gemini APIキーを保存してください'); return; }
+  apiKeys = raw.split(',').map(k => k.trim()).filter(Boolean);
+  keyIndex = 0;
 
   unlockSpeech();
 
@@ -146,8 +150,9 @@ async function analyze() {
     const base64 = captureFrame();
     const phase  = await callGemini(base64);
 
-    // 成功したらバックオフをリセット
+    // 成功したらバックオフをリセット・次のキーへ
     rateLimitRetry = 6000;
+    keyIndex = (keyIndex + 1) % apiKeys.length;
 
     if (phase && phase !== prevPhase) {
       prevPhase = phase;
@@ -163,9 +168,10 @@ async function analyze() {
     }
   } catch (e) {
     if (e.status === 429) {
-      // レートリミット: 指数バックオフ
+      // キーを次に回してリトライ
+      keyIndex = (keyIndex + 1) % apiKeys.length;
       rateLimitUntil = Date.now() + rateLimitRetry;
-      addLog(`⚠ レート制限 → ${rateLimitRetry / 1000}秒後に再開`, 'log-err');
+      addLog(`⚠ レート制限(key${keyIndex+1}) → ${rateLimitRetry / 1000}秒後に再開`, 'log-err');
       rateLimitRetry = Math.min(rateLimitRetry * 2, 60000);
     } else {
       addLog('⚠ ' + e.message, 'log-err');
@@ -208,7 +214,7 @@ async function callGemini(base64) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-goog-api-key': apiKey
+      'x-goog-api-key': apiKeys[keyIndex] || apiKeys[0]
     },
     body: JSON.stringify({
       contents: [{ parts: [
