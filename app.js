@@ -2,7 +2,7 @@
 
 // ── 定数 ──────────────────────────────────────────────
 const GEMINI_ENDPOINT =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 // ── DOM ───────────────────────────────────────────────
 const setupScreen   = document.getElementById('setup-screen');
@@ -172,7 +172,7 @@ async function callGemini(base64) {
           { inline_data: { mime_type: 'image/jpeg', data: base64 } }
         ]
       }],
-      generationConfig: { maxOutputTokens: 10, temperature: 0 }
+      generationConfig: { maxOutputTokens: 1024, temperature: 0 }
     })
   });
 
