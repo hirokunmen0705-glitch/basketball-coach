@@ -26,12 +26,13 @@ const phaseLabel     = document.getElementById('phase-label');
 const log            = document.getElementById('log');
 
 // ── 状態 ──────────────────────────────────────────────
-let apiKeys       = [];   // ローテーション用キー配列
-let keyIndex      = 0;
-let intervalSec   = 7;
-let prevPhase     = null;
-let timerId       = null;
-let isAnalyzing   = false;
+let apiKeys        = [];
+let keyIndex       = 0;
+let keyFailCount   = {};  // {index: 連続失敗回数}
+let intervalSec    = 7;
+let prevPhase      = null;
+let timerId        = null;
+let isAnalyzing    = false;
 let rateLimitUntil = 0;
 let rateLimitRetry = 6000;
 
@@ -63,6 +64,7 @@ startBtn.addEventListener('click', async () => {
   if (!raw) { alert('Gemini APIキーを保存してください'); return; }
   apiKeys = raw.split(',').map(k => k.trim()).filter(Boolean);
   keyIndex = 0;
+  keyFailCount = {};
 
   unlockSpeech();
 
@@ -132,6 +134,15 @@ stopBtn.addEventListener('click', () => {
   addLog('■ 停止', 'log-ok');
 });
 
+// ── 次の有効キーインデックスを返す ─────────────────────
+function nextActiveKey(current) {
+  for (let i = 1; i <= apiKeys.length; i++) {
+    const next = (current + i) % apiKeys.length;
+    if ((keyFailCount[next] || 0) < 3) return next;
+  }
+  return (current + 1) % apiKeys.length; // 全滅なら一周
+}
+
 // ── フレームキャプチャ → Gemini → 判定 ────────────────
 async function analyze() {
   if (isAnalyzing) return;
@@ -150,9 +161,10 @@ async function analyze() {
     const base64 = captureFrame();
     const phase  = await callGemini(base64);
 
-    // 成功したらバックオフをリセット・次のキーへ
+    // 成功したらリセット・次のキーへ
     rateLimitRetry = 6000;
-    keyIndex = (keyIndex + 1) % apiKeys.length;
+    keyFailCount[keyIndex] = 0;
+    keyIndex = nextActiveKey(keyIndex);
 
     if (phase && phase !== prevPhase) {
       prevPhase = phase;
@@ -168,10 +180,12 @@ async function analyze() {
     }
   } catch (e) {
     if (e.status === 429) {
-      // キーを次に回してリトライ
-      keyIndex = (keyIndex + 1) % apiKeys.length;
+      keyFailCount[keyIndex] = (keyFailCount[keyIndex] || 0) + 1;
+      const dead = keyFailCount[keyIndex] >= 3;
+      if (dead) addLog(`⚠ key${keyIndex+1} を除外（上限超過）`, 'log-err');
+      keyIndex = nextActiveKey(keyIndex);
       rateLimitUntil = Date.now() + rateLimitRetry;
-      addLog(`⚠ レート制限(key${keyIndex+1}) → ${rateLimitRetry / 1000}秒後に再開`, 'log-err');
+      if (!dead) addLog(`⚠ レート制限 → ${rateLimitRetry / 1000}秒待機`, 'log-err');
       rateLimitRetry = Math.min(rateLimitRetry * 2, 60000);
     } else {
       addLog('⚠ ' + e.message, 'log-err');
